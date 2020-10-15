@@ -5,3 +5,6 @@
 
 #mac stuff 
 .DS_Store
+
+#large csv file 
+prism_gridded_all.csv

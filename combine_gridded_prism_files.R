@@ -21,6 +21,17 @@ print(paste('All files have the same row length?', equalityCheck, sep = ' '))
 
 #merge files by grid
 mergedDF <- Reduce(function(x,y) merge(x,y,sort = FALSE) ,list(ppt,tmax,tmin))
-mergedDF <- rename(mergedDF, c("X"="grid cell"))
 
+#rename columns
+mergedDF <- rename(mergedDF, c("X"="grid cell", "sum.of.ppt"="total precip (mm)", "mean.of.tmax"="mean max temp (deg C)", "mean.of.tmin"="mean min temp (deg C)"))
 
+#format date to match desired csv output 
+datetimeDate <- as.Date(mergedDF$date, "%Y-%m-%d")
+mergedDF$month <- format(datetimeDate, "%m")
+mergedDF$year <- format(datetimeDate, "%Y")
+
+#reorder columns
+finalDF <- mergedDF[, c("grid cell", "month", "year", "total precip (mm)", "mean max temp (deg C)", "mean min temp (deg C)")]
+
+#save csv to local machine 
+write.csv(finalDF, file = "prism_gridded_all.csv", row.names=FALSE)
