@@ -13,8 +13,6 @@
 ## https://prism.oregonstate.edu/recent/
 ## To run the script, make sure you have an empty prism folder, containing empty folders with the name of each variable of interest
 
-## -------------- import script dependencies ---------------
-
 library(rgdal)
 library(raster)
 library(prism)
