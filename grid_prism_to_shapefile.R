@@ -22,7 +22,7 @@ options(stringsAsFactors = F)
 
 #define current working directory
 cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
-#cwd <- "/Users/nicolekeeney/github_repos/cocci_project" #local machine
+#cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
 
 calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
