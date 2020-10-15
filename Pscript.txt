@@ -1,0 +1,44 @@
+#!/bin/bash
+
+#!/bin/bash
+# Job name:
+#SBATCH --job-name=prism
+#
+#Account:
+
+#SBATCH --account=fc_envids
+
+#
+#Partition:
+
+#SBATCH --partition=savio2
+
+#
+# Request one node:
+
+#SBATCH --nodes=10
+
+#
+# Specify number of tasks for use case (example):
+#SBATCH --ntasks-per-node=20
+
+#
+# Processors per task:
+
+#SBATCH --cpus-per-task=1
+
+#
+#Wall clock limit (10hr  here):
+
+#SBATCH --time=20:00:00
+
+#
+##Command(s) to run:
+
+module load r
+
+module load r-packages
+
+module load r-spatial
+
+R CMD BATCH grid_prism_to_shapefile.R
