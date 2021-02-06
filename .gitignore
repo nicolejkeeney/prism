@@ -9,7 +9,11 @@
 */.DS_Store
 
 # Don't push data but keep README files explaining use
-data/*
+data/prism_gridded/*
 !data/prism_gridded/README.md
+
+data/prism_raw/*
 !data/prism_raw/README.md
+
+data/shapefiles/*
 !data/shapefiles/README.md

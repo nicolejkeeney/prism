@@ -1,0 +1,1 @@
+The prism_gridded folder contains data that has been processed in the grid_prism_to_shapefile.R script, which grids monthly raw prism data to a shapefile and computes monthly means or sums for each cell. 

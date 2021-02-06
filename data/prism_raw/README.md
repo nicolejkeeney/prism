@@ -1,0 +1,1 @@
+The prism_raw folder contains raw prism data downloaded using the prism package for R. This data is also accessible at the prism website https://prism.oregonstate.edu/ by variable and temporal scale. 

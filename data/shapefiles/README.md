@@ -1,0 +1,1 @@
+The shapefiles folder contains shapefiles used in the grid_prism_to_shapefile.R script.  
