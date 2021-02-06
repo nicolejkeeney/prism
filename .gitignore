@@ -1,10 +1,15 @@
+# R stuff (maybe I actually want to keep these??) 
 .Rproj.user
 .Rhistory
 .RData
 .Ruserdata
 
-#mac stuff 
+# Mac stuff 
 .DS_Store
+*/.DS_Store
 
-#large csv file 
-prism_gridded_all.csv
+# Don't push data but keep README files explaining use
+data/*
+!data/prism_gridded/README.md
+!data/prism_raw/README.md
+!data/shapefiles/README.md

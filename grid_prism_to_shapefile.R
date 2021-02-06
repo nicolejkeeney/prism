@@ -5,6 +5,7 @@
 ## Author: Nicole Keeney
 ##
 ## Date Created: 10-10-2020
+## Date Modified: 02-05-2021
 ##
 ## Email: nicolejkeeney@gmail.com
 ##
@@ -18,13 +19,17 @@ library(prism)
 library(sf)
 library(sp)
 library(parallel)
+library(exactextractr)
 options(stringsAsFactors = F)
 
-#define current working directory
-cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
-#cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
+# Define current working directory
+#cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
+cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
 
-calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
+# Define shapefile of interest 
+shapefile = 'tl_2016_06_tract'
+
+calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4269){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
   # Assumes prism data is loaded into "prism/" + var (see download_prism_data.R)
   #
@@ -38,7 +43,7 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
   # saves csv file to machine
   
   #get path to folders containing prism data for variable 
-  dataPath <- paste(cwd,"prism",var,sep = "/")
+  dataPath <- paste(cwd, "data", "prism_raw", var , sep = "/")
   
   #check to make sure inputs are valid 
   stopifnot((tolower(func) == "mean") | (tolower(func) == "sum"))
@@ -56,6 +61,14 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
   #load desired packages into each cluster
   clusterEvalQ(cl, {library(prism)}) 
   
+  # Check if data download from PRISM API worked. This has downloaded empty folders for me before. If this happens, just go to the PRISM website and download the bil folders directly, and put them in the correct location in the data folder to replace the empty folder. 
+  lapply(list.files(dataPath), function(x){
+    len_dir <- length(list.files(paste(dataPath,x,sep = '/')))
+    if (len_dir>0){
+      stop(paste0("Error: ",x, " is an empty folder. Download data from the prism website."))
+    }
+  })
+  
   #apply function fun to list 
   prism_list <- parLapply(cl = cl, X = dataPath, fun = function(path) {
     options(prism.path = path)
@@ -66,8 +79,8 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
   stopCluster(cl)
   
   #load shapefile with grids 
-  counties <- readOGR(shapefilePath)
-  counties <- spTransform(counties,crs(prism_list[[1]])@projargs)
+  counties <- read_sf(shapefilePath)
+  counties <- st_transform(counties, crs)
   ext <- raster::extent(counties)
   
   stack <- prism_list[[1]]
@@ -78,13 +91,7 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
     #crop prism data to shapefile 
     prismData <- stack@layers[[i]]
     crop <- raster::crop(x = prismData, y = ext) 
-    
-    if(tolower(func) == "mean"){
-      vals <- raster::extract(crop, counties, base::mean, na.rm = TRUE)
-    }
-    if(tolower(func) == "sum"){
-      vals <- raster::extract(crop, counties, base::sum, na.rm = TRUE)
-    }
+    vals <- exactextractr::exact_extract(crop, counties, func)
     vals <- as.list(vals)
     
     #create data frame of data
@@ -105,22 +112,27 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd()){
   final_df <- do.call(rbind, res_list)
   final_df$County<- rep(counties$NAMELSAD, length(unique(final_df$date)))
   final_df$Geoid <- rep(counties$GEOID, length(unique(final_df$date)))
-  write.csv(final_df,file = paste0(csvPath, "/", var, "_counties.csv")) 
+  write.csv(final_df,file = paste0(csvPath, "/", var, "_", func, "_gridded.csv")) 
   end <- Sys.time()
   print(end - begin)
 }
 
 #shapefile path 
-shapefilePath = paste0(cwd,"/lim_CA_grid/lim_CA_grid.shp")
+shapefilePath = paste0(cwd, '/data/shapefiles/', shapefile, '/', shapefile, '.shp')
 
 #path to save csv files to 
-csvPath = paste(cwd, "prism_gridded", sep = '/')
+csvPath <- paste(cwd, 'data', 'prism_gridded', sep = '/')
 
 #get mean max temp by grid cell 
-calcByGrid(var = "tmax", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+#calcByGrid(var = "tmax", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get mean min temp by grid cell 
-calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+#calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get total monthly precip by grid cell 
 calcByGrid(var = "ppt", func = "sum", shapefilePath = shapefilePath, csvPath = csvPath)
+
+#get mean monthly temp by grid cell 
+calcByGrid(var = "tmean", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+
+
