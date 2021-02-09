@@ -29,7 +29,7 @@ cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
 # Define shapefile of interest 
 shapefile = 'tl_2016_06_tract'
 
-calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4269){
+calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4326){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
   # Assumes prism data is loaded into "prism/" + var (see download_prism_data.R)
   #
@@ -64,8 +64,11 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   # Check if data download from PRISM API worked. This has downloaded empty folders for me before. If this happens, just go to the PRISM website and download the bil folders directly, and put them in the correct location in the data folder to replace the empty folder. 
   lapply(list.files(dataPath), function(x){
     len_dir <- length(list.files(paste(dataPath,x,sep = '/')))
-    if (len_dir>0){
-      stop(paste0("Error: ",x, " is an empty folder. Download data from the prism website."))
+    if (grepl('provisional', x, fixed = TRUE)){ 
+      stop(paste0("Error: ", x , " is a folder of provisional data. In order to run this script, delete provisional prism data from the prism_raw folder."))
+    }
+    if (len_dir==0){
+      stop(paste0("Error: ", x , " is an empty folder. Download data from the prism website."))
     }
   })
   
@@ -80,7 +83,7 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   
   #load shapefile with grids 
   counties <- read_sf(shapefilePath)
-  counties <- st_transform(counties, crs)
+  #counties <- st_transform(counties, crs)
   ext <- raster::extent(counties)
   
   stack <- prism_list[[1]]
@@ -130,7 +133,7 @@ csvPath <- paste(cwd, 'data', 'prism_gridded', sep = '/')
 #calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get total monthly precip by grid cell 
-calcByGrid(var = "ppt", func = "sum", shapefilePath = shapefilePath, csvPath = csvPath)
+calcByGrid(var = "ppt", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get mean monthly temp by grid cell 
 calcByGrid(var = "tmean", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
