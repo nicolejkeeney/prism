@@ -1,4 +1,4 @@
-# download_and_grid_prism
+# prism
 
 Some code for working with [prism climate data](https://prism.oregonstate.edu/). Includes a shell file for running the script in Berkeley HPC cluster, but since using the exactextractr package for gridding data to the shapefile, things are running quickly and I haven't needed to run it in the HPC.
 
