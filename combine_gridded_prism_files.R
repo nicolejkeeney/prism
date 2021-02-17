@@ -11,9 +11,9 @@
 library(plyr)
 
 #load csv files from local machine
-ppt <- read.csv("prism_gridded/ppt_counties.csv")
-tmax <- read.csv("prism_gridded/tmax_counties.csv")
-tmin <- read.csv("prism_gridded/tmin_counties.csv")
+ppt <- read.csv("data/prism_gridded/ppt_gridded.csv")
+tmax <- read.csv("data/prism_gridded/tmax_gridded.csv")
+tmin <- read.csv("data/prism_gridded/tmin_gridded.csv")
 
 #check that dataframes have the same number of rows 
 equalityCheck <- all(sapply(list(ppt,tmax,tmin), function(tbl) nrow(tbl) == nrow(ppt)))
@@ -34,4 +34,4 @@ mergedDF$year <- format(datetimeDate, "%Y")
 finalDF <- mergedDF[, c("grid cell", "month", "year", "total precip (mm)", "mean max temp (deg C)", "mean min temp (deg C)")]
 
 #save csv to local machine 
-write.csv(finalDF, file = "prism_gridded_all.csv", row.names=FALSE)
+write.csv(finalDF, file = "data/prism_gridded/prism_gridded_all.csv", row.names=FALSE)

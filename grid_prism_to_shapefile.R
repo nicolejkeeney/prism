@@ -24,10 +24,14 @@ options(stringsAsFactors = F)
 
 # Define current working directory
 #cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
-cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
+cwd <- "/Users/nicolekeeney/github_repos/prism" #local machine
 
 # Define shapefile of interest (use the folder name not the path to a shapefile)
-shapefile = 'lim_CA_grid_FIXED_2'
+shapefile <- 'lim_CA_grid_FIXED_2'
+
+# Define variables of interest 
+# These must correspond to PRISM variables
+vars <- c('tmax', 'tmin','ppt') 
 
 calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4326){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
@@ -41,6 +45,8 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   #
   # Returns: 
   # saves csv file to machine
+  begin <- Sys.time()
+  print(paste0("Extracting data for ", var, "..."))
   
   #get path to folders containing prism data for variable 
   dataPath <- paste(cwd, "data", "prism_raw", var , sep = "/")
@@ -83,14 +89,13 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   
   #load shapefile with grids 
   counties <- read_sf(shapefilePath)
-  #counties <- st_transform(counties, crs)
+  counties <- st_transform(counties, crs)
   ext <- raster::extent(counties)
   
   stack <- prism_list[[1]]
   res_list <- list()
-  
-  begin <- Sys.time()
-  for( i in 1:length(stack@layers)) {
+
+  for(i in 1:length(stack@layers)) {
     #crop prism data to shapefile 
     prismData <- stack@layers[[i]]
     crop <- raster::crop(x = prismData, y = ext) 
@@ -114,10 +119,11 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   
   final_df <- do.call(rbind, res_list)
   final_df$County<- rep(counties$NAMELSAD, length(unique(final_df$date)))
-  final_df$Geoid <- rep(counties$GEOID, length(unique(final_df$date)))
-  write.csv(final_df,file = paste0(csvPath, "/", var, "_", func, "_gridded.csv")) 
+  final_df$Geoid <- rep(counties$FID, length(unique(final_df$date)))
+  write.csv(final_df,file = paste0(csvPath, "/", var, "_gridded.csv")) 
   end <- Sys.time()
   print(end - begin)
+  print("complete!")
 }
 
 #shapefile path 
@@ -126,16 +132,7 @@ shapefilePath = paste0(cwd, '/data/shapefiles/', shapefile, '/', shapefile, '.sh
 #path to save csv files to 
 csvPath <- paste(cwd, 'data', 'prism_gridded', sep = '/')
 
-#get mean max temp by grid cell 
-calcByGrid(var = "tmax", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
-
-#get mean min temp by grid cell 
-calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
-
-#get total monthly precip by grid cell 
-calcByGrid(var = "ppt", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
-
-#get mean monthly temp by grid cell 
-#calcByGrid(var = "tmean", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
-
-
+for (var in vars){ 
+  #get mean max temp by grid cell 
+  calcByGrid(var = var, func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+}

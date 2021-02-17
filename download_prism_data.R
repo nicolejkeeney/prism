@@ -23,15 +23,15 @@ library(parallel)
 
 # ------------------- define desired variable --------------
 
-vars <- c('tmax', 'tmin','ppt') #these must correspond to prism variables
+vars <- c('tmax', 'tmin','ppt') # These must correspond to PRISM variables
 
-years <- 1981:2017 #desired range of years to get data for
+years <- 1981:2017 # Desired range of years to get data for
 
-mons <- 1:12 #desired months to get data for
+mons <- 1:12 # Desired months to get data for
 
 #define current working directory
 #cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
-cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
+cwd <- "/Users/nicolekeeney/github_repos/prism" #local machine
 
 #----------------- download data for each variable ------------------
 
