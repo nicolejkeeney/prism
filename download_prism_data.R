@@ -5,7 +5,7 @@
 ## Author: Nicole Keeney
 ##
 ## Date Created: 10-06-2020
-## Date Modified: 02-05-2021 
+## Last Modified: 02-17-2021 
 ##
 ## Email: nicolejkeeney@gmail.com
 ##
@@ -23,9 +23,9 @@ library(parallel)
 
 # ------------------- define desired variable --------------
 
-vars <- c('tmean','ppt') #these must correspond to prism variables
+vars <- c('tmax', 'tmin','ppt') #these must correspond to prism variables
 
-years <- 2018:2020 #desired range of years to get data for
+years <- 1981:2017 #desired range of years to get data for
 
 mons <- 1:12 #desired months to get data for
 
@@ -46,5 +46,4 @@ for(var in vars){
   options(prism.path = dirPath) #set location for where to download data to
   get_prism_monthlys(var, year = years, mon = mons, keepZip = FALSE) #get data!
 }
-
 

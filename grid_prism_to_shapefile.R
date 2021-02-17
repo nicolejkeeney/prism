@@ -5,7 +5,7 @@
 ## Author: Nicole Keeney
 ##
 ## Date Created: 10-10-2020
-## Date Modified: 02-05-2021
+## Last Modified: 02-17-2021
 ##
 ## Email: nicolejkeeney@gmail.com
 ##
@@ -26,8 +26,8 @@ options(stringsAsFactors = F)
 #cwd <- "/global/scratch/nicolekeeney/cocci_project_savio" #working directory for cocci_project in savio 
 cwd <- "/Users/nicolekeeney/github_repos/download_and_grid_prism" #local machine
 
-# Define shapefile of interest 
-shapefile = 'tl_2016_06_tract'
+# Define shapefile of interest (use the folder name not the path to a shapefile)
+shapefile = 'lim_CA_grid_FIXED_2'
 
 calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4326){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
@@ -127,15 +127,15 @@ shapefilePath = paste0(cwd, '/data/shapefiles/', shapefile, '/', shapefile, '.sh
 csvPath <- paste(cwd, 'data', 'prism_gridded', sep = '/')
 
 #get mean max temp by grid cell 
-#calcByGrid(var = "tmax", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+calcByGrid(var = "tmax", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get mean min temp by grid cell 
-#calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+calcByGrid(var = "tmin", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get total monthly precip by grid cell 
 calcByGrid(var = "ppt", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 #get mean monthly temp by grid cell 
-calcByGrid(var = "tmean", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
+#calcByGrid(var = "tmean", func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 
 
