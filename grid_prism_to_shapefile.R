@@ -11,7 +11,7 @@
 ##
 ## Notes: 
 ## This code is adapted from a script written by Sophie Phillips
-##
+## Make sure you check the column names of the input shapefile. You'll need to add this into the code within the function when you create the output csv.
 
 library(rgdal)
 library(raster)
@@ -89,7 +89,7 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   
   #load shapefile with grids 
   counties <- read_sf(shapefilePath)
-  counties <- st_transform(counties, crs)
+  counties <- st_transform(counties, crs(prism_list[[1]])@projargs)
   ext <- raster::extent(counties)
   
   stack <- prism_list[[1]]
@@ -118,7 +118,7 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   }
   
   final_df <- do.call(rbind, res_list)
-  final_df$County<- rep(counties$NAMELSAD, length(unique(final_df$date)))
+  final_df$County<- rep(counties$NAME, length(unique(final_df$date)))
   final_df$Geoid <- rep(counties$FID, length(unique(final_df$date)))
   write.csv(final_df,file = paste0(csvPath, "/", var, "_gridded.csv")) 
   end <- Sys.time()
@@ -136,3 +136,4 @@ for (var in vars){
   #get mean max temp by grid cell 
   calcByGrid(var = var, func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 }
+
