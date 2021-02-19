@@ -27,11 +27,11 @@ options(stringsAsFactors = F)
 cwd <- "/Users/nicolekeeney/github_repos/prism" #local machine
 
 # Define shapefile of interest (use the folder name not the path to a shapefile)
-shapefile <- 'lim_CA_grid_FIXED_2'
+shapefile <- 'tl_2016_06_tract'
 
 # Define variables of interest 
 # These must correspond to PRISM variables
-vars <- c('tmax', 'tmin','ppt') 
+vars <- c('tmean','ppt') 
 
 calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs = 4326){
   # Calculate mean or sum of input var by grid cell for input raster prism data and shapefile
@@ -118,8 +118,9 @@ calcByGrid <- function(var, shapefilePath, func = "mean", csvPath = getwd(), crs
   }
   
   final_df <- do.call(rbind, res_list)
-  final_df$County<- rep(counties$NAME, length(unique(final_df$date)))
-  final_df$Geoid <- rep(counties$FID, length(unique(final_df$date)))
+  final_df$NAME<- rep(counties$NAME, length(unique(final_df$date)))
+  final_df$GEOID <- rep(counties$GEOID, length(unique(final_df$date)))
+  final_df$NAMELSAD <- rep(counties$NAMELSAD, length(unique(final_df$date)))
   write.csv(final_df,file = paste0(csvPath, "/", var, "_gridded.csv")) 
   end <- Sys.time()
   print(end - begin)
@@ -136,4 +137,3 @@ for (var in vars){
   #get mean max temp by grid cell 
   calcByGrid(var = var, func = "mean", shapefilePath = shapefilePath, csvPath = csvPath)
 }
-

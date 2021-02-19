@@ -23,10 +23,12 @@ library(parallel)
 
 # ------------------- define desired variable --------------
 
-vars <- c('tmax', 'tmin','ppt') # These must correspond to PRISM variables
+#vars <- c('tmax', 'tmin','ppt') # These must correspond to PRISM variables
+vars <- c('tmean','ppt')
 
-years <- 1981:2017 # Desired range of years to get data for
-
+#years <- 1981:2017 # Desired range of years to get data for
+years <- 2018:2020
+  
 mons <- 1:12 # Desired months to get data for
 
 #define current working directory
